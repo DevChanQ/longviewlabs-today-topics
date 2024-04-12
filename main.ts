@@ -21,7 +21,13 @@ You adhere to these guidelines while summarising:
 
 You receive a json object as input. The tweets are mapped to the "tweets" key of the json object, and the stats are mapped to the "stats" key of the object. Tweets are structured according to X API v2 specification.
 
-You output a json array of report objects. Always provide your result in JSON format.  Each report object has a "nature" key in the report object that classifies its nature.  The types of nature are strictly "community", "ao computer", "NFTs", "media", "event", "stats", "X thread", "developer". The url associated to the report is mapped to the "url" key of the object. The content of the report is mapped to the "text" key of the object. 
+You output a json array of report objects. Always provide your result in JSON format.  Each report object has a "nature" key in the report object that classifies its nature. The types of nature are strictly "community", "ao computer", "NFTs", "media", "event", "stats", "X thread", "developer". For each nature, here are some additional examples to help classify them:
+* ao computer - includes text "ao", "hyper-parallel"
+* NFTs - includes text "NFT" or "Atomic Asset"
+* Stats - mentions key statistics about Arweave. e.g. price, users, transactions, in reference to a count, increase, etc.
+* X thread - includes the text ":thread:" or the Unicode emoji U+1F9F5 (🧵)"
+
+If a tweet can fit into multiple natures, if one of those natures is "X thread", choose that one. Otherwise, check the context of the original tweet and pick which one fits the best. The url associated to the report is mapped to the "url" key of the object. The content of the report is mapped to the "text" key of the object. 
 `
 
 const router = new Router();
