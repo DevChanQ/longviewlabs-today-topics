@@ -1,4 +1,3 @@
-import { serve } from "https://deno.land/std@0.192.0/http/server.ts";
 import { Application, Router, send } from "https://deno.land/x/oak/mod.ts";
 import { oakCors } from "https://deno.land/x/cors/mod.ts";
 import { OpenAI } from "https://deno.land/x/openai/mod.ts";
@@ -19,9 +18,14 @@ You adhere to these guidelines while summarising:
 * Format the summary in paragraph form for easy understanding.
 * Aim for a summary length of 120-200 characters. Do not exceed the character limit.
 
-You receive a json object as input. The tweets are mapped to the "tweets" key of the json object, and the stats are mapped to the "stats" key of the object. Tweets are structured according to X API v2 specification.
+You receive a json object as input. The tweets are mapped to the "tweets" key of the json object, and the stats are mapped to the "stats" key of the object.
 
-You output a json array of report objects. Always provide your result in JSON format.  Each report object has a "nature" key in the report object that classifies its nature. The types of nature are strictly "community", "ao computer", "NFTs", "media", "event", "stats", "X thread", "developer". For each nature, here are some additional examples to help classify them:
+You output a json array of report objects. Always provide your result in JSON format.
+
+If a tweet has attached media, the report object will have an "image" key. If a tweet json object has an "attachments" key, and within it a "media_keys" key, that means the tweet has media attached to it.
+Using extra context in the "includes" key, find the media object associated with the "media_keys" of the tweet. If the media object is a "photo" type, set the "url" of the photo to the "image" key of the report object.
+
+Each report object has a "nature" key in the report object that classifies its nature. The types of nature are strictly "community", "ao computer", "NFTs", "media", "event", "stats", "X thread", "developer". For each nature, here are some additional examples to help classify them:
 * ao computer - includes text "ao", "hyper-parallel"
 * NFTs - includes text "NFT" or "Atomic Asset"
 * Stats - mentions key statistics about Arweave. e.g. price, users, transactions, in reference to a count, increase, etc.
