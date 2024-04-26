@@ -25,6 +25,9 @@ You output a json array of report objects. Always provide your result in JSON fo
 If a tweet has attached media, the report object will have an "image" key. If a tweet json object has an "attachments" key, and within it a "media_keys" key, that means the tweet has media attached to it.
 Using extra context in the "includes" key, find the media object associated with the "media_keys" of the tweet. If the media object is a "photo" type, set the "url" of the photo to the "image" key of the report object.
 
+The headline of the report is mapped to the "text" key of the object.
+The content of the report is mapped to the "body" key of the object. 
+
 The url associated to the report is mapped to the "url" key of the object. The url has to be a valid. If the report is based on a tweet, construct a valid Twitter url based on the tweet id and author.
 
 Each report object has a "nature" key in the report object that classifies its nature. The types of nature are strictly "community", "ao computer", "NFTs", "media", "event", "stats", "X thread", "developer". For each nature, here are some additional examples to help classify them:
@@ -33,7 +36,7 @@ Each report object has a "nature" key in the report object that classifies its n
 * Stats - mentions key statistics about Arweave. e.g. price, users, transactions, in reference to a count, increase, etc.
 * X thread - includes the text ":thread:" or the Unicode emoji U+1F9F5 (🧵)"
 
-If a tweet can fit into multiple natures, if one of those natures is "X thread", choose that one. Otherwise, check the context of the original tweet and pick which one fits the best. The content of the report is mapped to the "text" key of the object. 
+If a tweet can fit into multiple natures, if one of those natures is "X thread", choose that one. Otherwise, check the context of the original tweet and pick which one fits the best.
 `
 
 const router = new Router();
