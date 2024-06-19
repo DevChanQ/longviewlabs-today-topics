@@ -1,9 +1,16 @@
 import { Application, Router, send } from "https://deno.land/x/oak/mod.ts";
 import { oakCors } from "https://deno.land/x/cors/mod.ts";
 import { OpenAI } from "https://deno.land/x/openai/mod.ts";
+import { load } from "https://deno.land/std@0.224.0/dotenv/mod.ts";
 
-const openai = new OpenAI();
-const port = 80;
+import { DataInput } from "./types.ts";
+
+const env = await load();
+
+const openai = new OpenAI({
+  apiKey: env['OPENAI_API_KEY']
+});
+const port = 8000;
 
 const role = `
 You are a professional summariser. You create a concise yet comprehensive summary of the provided tweets & statistics and classifies the reports into topics.
@@ -28,7 +35,7 @@ Using extra context in the "includes" key, find the media object associated with
 The headline of the report is mapped to the "text" key of the object.
 The content of the report is mapped to the "body" key of the object. 
 
-The url associated to the report is mapped to the "url" key of the object. The url has to be a valid. If the report is based on a tweet, construct a valid Twitter url based on the tweet id and author.
+The url associated to the report is mapped to the "url" key of the object. The "url" key of a tweet is used as the url for the tweet. 
 
 Each report object has a "nature" key in the report object that classifies its nature. The types of nature are strictly "community", "ao computer", "NFTs", "media", "event", "stats", "X thread", "developer". For each nature, here are some additional examples to help classify them:
 * ao computer - includes text "ao", "hyper-parallel"
@@ -44,26 +51,32 @@ router
   .post("/generate", async (context) => {
     const { request } = context;
     const data = await request.body.json();
-    if (!data['input']) {
-        context.response.status = 400;
-        return;
+    const input = data.input as DataInput;
+    if (!input) {
+      context.response.status = 400;
+      return;
+    }
+    
+    // set url of the tweet before sending to openai
+    if (input.tweets && input.tweets.data) {
+      for (const tweet of input.tweets.data as Array<any>) {
+        tweet.url = `https://twitter.com/statuses/${tweet.id}`;
+      }
     }
 
     const chatCompletion = await openai.chat.completions.create({
-        model: "gpt-4",
-        messages: [
-            {
-                "role": "system",
-                "content": role
-            },
-            { 
-                "role": "user",
-                "content": JSON.stringify(data['input'])
-            }
-        ]
+      model: "gpt-4",
+      messages: [
+        {
+          "role": "system",
+          "content": role
+        },
+        { 
+          "role": "user",
+          "content": JSON.stringify(data['input'])
+        }
+      ]
     });
-
-    console.log(chatCompletion.choices[0].message.content);
 
     context.response.headers.set("Content-Type", "application/json")
     context.response.body = chatCompletion.choices[0].message.content;
@@ -71,11 +84,11 @@ router
 
 const app = new Application();
 app.use(
-    oakCors({
-        origin: /^.+(localhost:(1337|3000))$/,
-    })
+  oakCors({
+    origin: /^.+(localhost:(1337|3000))$/,
+  })
 ); // Enable CORS for All Routes
 app.use(router.routes());
 
-console.log(`HTTP webserver running. Access it at: http://localhost:80/`);
+console.log(`HTTP webserver running. Access it at: http://localhost:${port}`);
 await app.listen({ port });
