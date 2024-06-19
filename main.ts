@@ -10,7 +10,7 @@ const env = await load();
 const openai = new OpenAI({
   apiKey: env['OPENAI_API_KEY']
 });
-const port = 8000;
+const port = 80;
 
 const role = `
 You are a professional summariser. You create a concise yet comprehensive summary of the provided tweets & statistics and classifies the reports into topics.
