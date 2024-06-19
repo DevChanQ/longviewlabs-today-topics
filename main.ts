@@ -60,7 +60,7 @@ router
     // set url of the tweet before sending to openai
     if (input.tweets && input.tweets.data) {
       for (const tweet of input.tweets.data as Array<any>) {
-        tweet.url = `https://twitter.com/statuses/${tweet.id}`;
+        tweet.url = `https://x.com/statuses/${tweet.id}`;
       }
     }
 
