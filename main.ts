@@ -60,7 +60,18 @@ router
     // set url of the tweet before sending to openai
     if (input.tweets && input.tweets.data) {
       for (const tweet of input.tweets.data as Array<any>) {
-        tweet.url = `https://x.com/statuses/${tweet.id}`;
+        // find author username from includes
+        let username = "onlyarweave"; // default username
+        const author_id = tweet.author_id;
+        const users = input.tweets.includes?.users;
+        if (users && author_id) {
+          const user = users.find(u => u.id === author_id);
+          if (user) {
+            username = user.username;
+          }
+        }
+
+        tweet.url = `https://x.com/${username}/status/${tweet.id}`;
       }
     }
 
